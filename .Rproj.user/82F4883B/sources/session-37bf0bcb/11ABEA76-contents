@@ -1,0 +1,106 @@
+#Para rodar o codigo e necessario rodar o documento "leitura_filtragem_02" e ter acesso a pasta "base_de_dados" com os dados e SIM 
+#Também é necessário ter as bases de dados: tabela_idh_municipios; tabela_idh_estados; pop_est_10a22; pop_mun_10e22
+
+
+
+# Ler os dados sobre os IDHs e população dos estados e municipios
+
+tabela_idh_mun <- readRDS("tabela_idh_municipios.rds")
+
+tabela_idh_est <- readRDS("tabela_idh_estados.rds")
+
+pop_est_10a22 <- readRDS("pop_est_10a22.rds")
+
+pop_mun_10e22 <- readRDS("pop_mun_10e22.rds")
+
+
+
+
+#ESTADOS BRASILEIROS
+
+
+#CALCULAR TAXA DE MORTALIDADE A CADA 100.000 HABITANTES
+
+  # Agrupar a quantidade de mortes por estado em cada ano
+  dados_idh_estados <- dados_br_psic %>%
+    group_by(Sigla, ANOOBITO) %>%
+    summarize(total_mortes = n())
+  
+  #Acrescentar as informacoes sobre populacao ao data frame com as informacao do IDH
+  dados_idh_estados <- dados_idh_estados %>%
+    left_join(pop_est_10a22, by = "Sigla")
+  
+
+  #Acrescentando coluna com taxa de mortalidade de cada estado em cada ano
+  #aqui serao usados os dados do Censo 2010 e 2022 e não os dados das projeções
+  
+  #Converter dados pra numerico e tirar espaco em branco
+  dados_idh_estados <- dados_idh_estados %>%
+    mutate(
+      POP_2022 = as.numeric(gsub(" ", "", POP_2022)),
+      total_mortes = as.numeric(total_mortes)
+    )
+  
+  
+  #Calcular a taxa de mortalidade baseada na população de 2010 E DE 2022
+  
+  dados_idh_estados <- dados_idh_estados %>%
+    mutate(mortalidade_C2010 = (total_mortes / POP_2010) * 100000)
+  
+  dados_idh_estados <- dados_idh_estados %>%
+    mutate(mortalidade_C2022 = (total_mortes / POP_2022) * 100000)
+  
+  
+  
+
+#CIDADES DO ESPIRITO SANTO (usando como base o codigo de municipio de residencia)
+  
+  
+#CALCULAR TAXA DE MORTALIDADE A CADA 10.000 HABITANTES
+  
+  # Agrupar a quantidade de mortes por municipio do espirito santo em cada ano
+  dados_idh_municipios <- dados_es_psic %>%
+    group_by(CODMUNRES, ANOOBITO) %>%
+    summarize(total_mortes = n())
+  
+  #somar as mortes totais por municipios de 2013 a 2022 
+  #(essa soma elimina o fator tempo da analise, porém da uma melhor noção do numero de mortes baseado no tamanho da cidade)
+  dados_idh_municipios <- dados_idh_municipios %>%
+    group_by(CODMUNRES) %>%
+    mutate(mortes_13a22 = sum(total_mortes, na.rm = TRUE))
+  
+  # Converter CODMUNRES para character
+  dados_idh_municipios <- dados_idh_municipios %>%
+    mutate(CODMUNRES = as.character(CODMUNRES))
+  
+  # Converter CODMUN para character
+  pop_mun_10e22 <- pop_mun_10e22 %>%
+    mutate(CODMUNRES = as.character(CODMUNRES))
+  
+  #Acrescentar as informacoes sobre populacao ao data frame com as informacao do IDH
+  dados_idh_municipios <- dados_idh_municipios %>%
+    left_join(pop_mun_10e22, by = "CODMUNRES")
+  
+  #Converter dados pra numerico e tirar espaco em branco
+  dados_idh_municipios <- dados_idh_municipios %>%
+    mutate(
+      POP_2022 = as.numeric(gsub(" ", "", POP_2022)),
+      total_mortes = as.numeric(total_mortes)
+    )
+  
+  #Calcular a taxa de mortalidade anual baseada na população de 2010 E DE 2022
+  dados_idh_municipios <- dados_idh_municipios %>%
+    mutate(mortalidade_mun_C2010 = (total_mortes / POP_2010) * 10000)
+  
+  dados_idh_municipios <- dados_idh_municipios %>%
+    mutate(mortalidade_mun_C2022 = (total_mortes / POP_2022) * 10000)
+  
+  #Calcular a taxa de mortalidade baseada na cidade, somando todos os anos
+  dados_idh_municipios <- dados_idh_municipios %>%
+    mutate(mortalidade_tot_C2010 = (mortes_13a22 / POP_2010) * 10000)
+  
+  dados_idh_municipios <- dados_idh_municipios %>%
+    mutate(mortalidade_tot_C2022 = (mortes_13a22 / POP_2022) * 10000)
+  
+  
+  
