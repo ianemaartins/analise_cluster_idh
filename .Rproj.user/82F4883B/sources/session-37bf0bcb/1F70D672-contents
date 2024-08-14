@@ -19,15 +19,7 @@ for (ano in 2013:2022) {
   # Realizar a clusterização hierárquica
   hc_ano_est <- hclust(dist_ano_est, method = "ward.D2")
   
-  # Plotar o dendrograma
-  dendrograma_plot <- plot(hc_ano_est, labels = dados_ano_est$Estado, 
-                           main = paste("Dendrograma de Clusterização Hierárquica (Estados) -", ano), 
-                           xlab = "", ylab = "Altura")
-  
-  # Cortar o dendrograma para formar um número apropriado de clusters
-  rect.hclust(hc_ano_est, k = 5, border = 2:6)
-  
-  # Salvar o dendrograma como um arquivo PNG
+  # Plotar e salvar o dendrograma
   png(filename = paste0("dendrograma_est_", ano, ".png"))
   plot(hc_ano_est, labels = dados_ano_est$Estado, 
        main = paste("Dendrograma de Clusterização Hierárquica (Estados) -", ano), 
@@ -38,25 +30,37 @@ for (ano in 2013:2022) {
   # Adicionar os clusters ao data frame original
   dados_ano_est$cluster_hc <- cutree(hc_ano_est, k = 5)
   
-  # Visualizar os clusters para o ano específico
-  cluster_plot <- ggplot(dados_ano_est, aes(x = IDHM, y = mortalidade_C2010, color = as.factor(cluster_hc))) +
-    geom_point(size = 2) +
-    labs(color = "Cluster", y = "Taxa de Mortalidade", x = "IDH") +
-    theme_minimal() +
-    ggtitle(paste("Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Estados -", ano))
+  # Criar o gráfico com Plotly
+  p_hc_est <- plot_ly(
+    data = dados_ano_est,
+    x = ~IDHM,
+    y = ~mortalidade_C2010,
+    color = ~as.factor(cluster_hc),
+    colors = "Set1",
+    type = 'scatter',
+    mode = 'markers',
+    text = ~Sigla, 
+    hoverinfo = 'text',
+    marker = list(size = 10)
+  ) %>%
+    layout(
+      title = paste("Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Estados -", ano),
+      xaxis = list(title = "IDH"),
+      yaxis = list(title = "Taxa de Mortalidade")
+    )
   
-  # Exibir o gráfico
-  print(cluster_plot)
+
+  print(p_hc_est)
   
-  # Salvar o gráfico dos clusters como um arquivo PNG
-  ggsave(filename = paste0("cluster_hierarquico_est_", ano, ".png"), plot = cluster_plot)
+  # Salvar os gráficos interativos como html 
+  htmlwidgets::saveWidget(as_widget(p_hc_est), paste0("hierarquico2010_est_", ano, ".html"))
 }
 
 
 
 
 
-# MUNICIPIOS
+# MUNICÍPIOS
 
 for (ano in 2013:2022) {
   
@@ -76,18 +80,10 @@ for (ano in 2013:2022) {
   # Realizar a clusterização hierárquica
   hc_ano_mun <- hclust(dist_ano_mun, method = "ward.D2")
   
-  # Plotar o dendrograma
-  dendrograma_plot_mun <- plot(hc_ano_mun, labels = dados_ano_mun$Municipio, 
-                               main = paste("Dendrograma de Clusterização Hierárquica (Municipios) -", ano), 
-                               xlab = "", ylab = "Altura")
-  
-  # Cortar o dendrograma para formar um número apropriado de clusters
-  rect.hclust(hc_ano_mun, k = 3, border = 2:4)
-  
-  # Salvar o dendrograma como um arquivo PNG
+  # Plotar e salvar o dendrograma
   png(filename = paste0("dendrograma_mun_", ano, ".png"))
   plot(hc_ano_mun, labels = dados_ano_mun$Municipio, 
-       main = paste("Dendrograma de Clusterização Hierárquica (Municipios) -", ano), 
+       main = paste("Dendrograma de Clusterização Hierárquica (Municípios) -", ano), 
        xlab = "", ylab = "Altura")
   rect.hclust(hc_ano_mun, k = 3, border = 2:4)
   dev.off()
@@ -95,27 +91,38 @@ for (ano in 2013:2022) {
   # Adicionar os clusters ao data frame original
   dados_ano_mun$cluster_hc_mun <- cutree(hc_ano_mun, k = 3)
   
-  # Visualizar os clusters para o ano específico
-  cluster_plot_mun <- ggplot(dados_ano_mun, aes(x = IDHM, y = mortalidade_mun_C2010, color = as.factor(cluster_hc_mun))) +
-    geom_point(size = 2) +
-    labs(color = "Cluster", y = "Taxa de Mortalidade", x = "IDH") +
-    theme_minimal() +
-    ggtitle(paste("Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Municipios do ES -", ano))
+  # Criar o gráfico com Plotly
+  p_hc_mun <- plot_ly(
+    data = dados_ano_mun,
+    x = ~IDHM,
+    y = ~mortalidade_mun_C2010,
+    color = ~as.factor(cluster_hc_mun),
+    colors = "Set1",
+    type = 'scatter',
+    mode = 'markers',
+    text = ~CIDADE, 
+    hoverinfo = 'text',
+    marker = list(size = 10)
+  ) %>%
+    layout(
+      title = paste("Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Municípios -", ano),
+      xaxis = list(title = "IDH"),
+      yaxis = list(title = "Taxa de Mortalidade")
+    )
   
-  # Exibir o gráfico
-  print(cluster_plot_mun)
   
-  # Salvar o gráfico dos clusters como um arquivo PNG
-  ggsave(filename = paste0("cluster_hierarquico_mun_", ano, ".png"), plot = cluster_plot_mun)
+  print(p_hc_mun)
+  
+  # Salvar os gráficos interativos como html 
+  htmlwidgets::saveWidget(as_widget(p_hc_mun), paste0("hierarquico2010_mun_", ano, ".html"))
 }
 
 
 
 
-#DECADA
+# DÉCADA
 
-
-# Desagrupar o data frame original para garantir que não há agrupamento residual
+# Desagrupar o data frame original 
 dados_idh_municipios_decada <- dados_idh_municipios %>%
   ungroup()
 
@@ -146,18 +153,10 @@ dist_decada_mun <- dist(dados_cluster_decada_mun, method = "euclidean")
 # Realizar a clusterização hierárquica
 hc_decada_mun <- hclust(dist_decada_mun, method = "ward.D2")
 
-# Plotar o dendrograma
-plot(hc_decada_mun, labels = dados_decada_mun$Municipio, 
-     main = "Dendrograma de Clusterização Hierárquica (Municípios) - Década 2013-2022", 
-     xlab = "", ylab = "Altura")
-
-# Cortar o dendrograma para formar um número apropriado de clusters (por exemplo, 3)
-rect.hclust(hc_decada_mun, k = 3, border = 2:4)
-
-# Salvar o dendrograma como um arquivo PNG
+# Plotar e salvar o dendrograma
 png(filename = "dendrograma_mun_decada_2013_2022.png")
-plot(hc_decada_mun, labels = dados_decada_mun$Municipio, 
-     main = "Dendrograma de Clusterização Hierárquica (Municípios) - Década 2013-2022", 
+plot(hc_decada_mun, labels = dados_decada_mun$CIDADE, 
+     main = "Hierárquica: Dendrograma dos Municípios - Década 2013-2022", 
      xlab = "", ylab = "Altura")
 rect.hclust(hc_decada_mun, k = 3, border = 2:4)
 dev.off()
@@ -166,16 +165,28 @@ dev.off()
 dados_decada_mun <- dados_decada_mun %>%
   mutate(cluster_hc_decada_mun = cutree(hc_decada_mun, k = 3))
 
-# Visualizar os clusters para toda a década
-cluster_plot_decada_mun <- ggplot(dados_decada_mun, aes(x = IDHM_decada, y = mortalidade_tot_decada_C2010, color = as.factor(cluster_hc_decada_mun))) +
-  geom_point(size = 2) +
-  labs(color = "Cluster", y = "Taxa de Mortalidade (Total da Década)", x = "IDH") +
-  theme_minimal() +
-  ggtitle("Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Municípios do ES - Década 2013-2022")
+# Criar o gráfico da década com Plotly
+p_decada_hc_mun <- plot_ly(
+  data = dados_decada_mun,
+  x = ~IDHM_decada,
+  y = ~mortalidade_tot_decada_C2010,
+  color = ~as.factor(cluster_hc_decada_mun),
+  colors = "Set1",
+  type = 'scatter',
+  mode = 'markers',
+  text = ~CIDADE,  
+  hoverinfo = 'text',
+  marker = list(size = 10)
+) %>%
+  layout(
+    title = "Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Municípios do ES - Década 2013-2022",
+    xaxis = list(title = "IDH"),
+    yaxis = list(title = "Taxa de Mortalidade (Total da Década)")
+  )
 
-# Exibir o gráfico
-print(cluster_plot_decada_mun)
 
-# Salvar o gráfico dos clusters como um arquivo PNG
-ggsave(filename = "cluster_hierarquico_decada_mun_2013_2022.png", plot = cluster_plot_decada_mun)
+print(p_decada_hc_mun)
+
+# Salvar o gráfico interativo da década como html 
+htmlwidgets::saveWidget(as_widget(p_decada_hc_mun), "hierarquico_dec_mun.html")
 

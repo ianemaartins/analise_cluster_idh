@@ -1,3 +1,9 @@
+#library(dplyr)
+#library(ggplot2)
+#library(plotly)
+
+
+
 # ESTADOS
 
 # Desagrupar o data frame
@@ -17,10 +23,10 @@ for (i in 2:15) wss_est[i] <- sum(kmeans(dados_cluster_est, centers=i, nstart=25
 # Plotar o gráfico para o método do cotovelo
 plot(1:15, wss_est, type="b", xlab="Número de Clusters (k)", ylab="WSS (within sum of squares)")
 
-# Executar K-means com o número ótimo de clusters
+# Executar K-means com o número de clusters determinado
 resultado_kmedia_est <- kmeans(dados_cluster_est, centers = 4, nstart=25)
 
-# Adicionar os rótulos dos clusters ao data frame original
+# Adicionar os clusters no data frame original
 dados_idh_estados <- dados_idh_estados %>%
   mutate(cluster_km = resultado_kmedia_est$cluster)
 
@@ -36,19 +42,34 @@ for (ano in 2013:2022) {
   dados_ano <- dados_idh_estados %>%
     filter(ANOOBITO == ano)
   
-  # Criar o gráfico
-  kmedia2010_est13a22 <- ggplot(dados_ano, aes(x = IDHM, y = mortalidade_C2010, color = as.factor(cluster_km))) +
-    geom_point(size = 3) +
-    labs(color = "Cluster", y = "Taxa de Mortalidade") +
-    theme_minimal() +
-    ggtitle(paste("K-médias: IDH e mortalidade por psicoativos em", ano))
+  # Criar o gráfico com Plotly
+  p_est <- plot_ly(
+    data = dados_ano,
+    x = ~IDHM,
+    y = ~mortalidade_C2010,
+    color = ~as.factor(cluster_km),
+    colors = "Set1",
+    type = 'scatter',
+    mode = 'markers',
+    text = ~Sigla, 
+    hoverinfo = 'text',
+    marker = list(size = 10)
+  ) %>%
+    layout(
+      title = paste("K-médias: IDH e mortalidade por psicoativos em", ano),
+      xaxis = list(title = "IDH"),
+      yaxis = list(title = "Taxa de Mortalidade")
+    )
   
-  # Exibir o gráfico
-  print(kmedia2010_est13a22)
   
-  # Salvar os gráficos
-  ggsave(filename = paste0("kmedia2010_est_", ano, ".png"), plot = kmedia2010_est13a22)
+  print(p_est)
+  
+  # Salvar os gráficos interativos como html 
+  htmlwidgets::saveWidget(as_widget(p), paste0("kmedia2010_est_", ano, ".html"))
 }
+  
+  
+
 
 
 
@@ -65,45 +86,51 @@ dados_cluster_mun <- dados_idh_municipios %>%
   mutate(across(everything(), as.numeric)) %>%
   scale()
 
-# Calcular o total within sum of squares (wss) para diferentes valores de k
+# Calcular o total within sum of squares (wss) 
 wss_mun <- (nrow(dados_cluster_mun)-1)*sum(apply(dados_cluster_mun, 2, var))
 for (i in 2:15) wss_mun[i] <- sum(kmeans(dados_cluster_mun, centers=i, nstart=25)$tot.withinss)
 
 # Plotar o gráfico para o método do cotovelo
 plot(1:15, wss_mun, type="b", xlab="Número de Clusters (k)", ylab="WSS (within sum of squares)")
 
-# Executar K-means com o número ótimo de clusters
+# Executar K-means com o número de clusters dado
 resultado_kmedia_mun <- kmeans(dados_cluster_mun, centers = 4, nstart=25)
 
 # Adicionar os rótulos dos clusters ao data frame original
 dados_idh_municipios <- dados_idh_municipios %>%
   mutate(cluster_km_mun = resultado_kmedia_mun$cluster)
 
-# Visualizar os clusters baseados em IDH e taxa de mortalidade
-ggplot(dados_idh_municipios, aes(x = IDHM, y = mortalidade_mun_C2010, color = as.factor(cluster_km_mun))) +
-  geom_point(size = 2) +
-  labs(color = "Cluster") +
-  theme_minimal() +
-  ggtitle("K-médias: IDH dos Municípios do ES e Taxa de Mortalidade")
-
 # Filtrar pelos anos e plotar
 for (ano in 2013:2022) {
   dados_ano_mun <- dados_idh_municipios %>%
     filter(ANOOBITO == ano)
   
-  # Criar o gráfico
-  kmedia2010_mun13a22 <- ggplot(dados_ano_mun, aes(x = IDHM, y = mortalidade_mun_C2010, color = as.factor(cluster_km_mun))) +
-    geom_point(size = 3) +
-    labs(color = "Cluster",y = "Taxa de Mortalidade") +
-    theme_minimal() +
-    ggtitle(paste("K-médias: IDH dos municípios e mortalidade por psicoativos em", ano))
+  # Criar o gráfico interativo com Plotly
+  p_mun <- plot_ly(
+    data = dados_ano_mun,
+    x = ~IDHM,
+    y = ~mortalidade_mun_C2010,
+    color = ~as.factor(cluster_km_mun),
+    colors = "Set1",
+    type = 'scatter',
+    mode = 'markers',
+    text = ~CIDADE,  
+    hoverinfo = 'text',
+    marker = list(size = 10)
+  ) %>%
+    layout(
+      title = paste("K-médias: IDH dos municípios e mortalidade por psicoativos em", ano),
+      xaxis = list(title = "IDH"),
+      yaxis = list(title = "Taxa de Mortalidade")
+    )
   
-  # Exibir o gráfico
-  print(kmedia2010_mun13a22)
+  print(p_mun)
   
-  # Salvar os gráficos
-  ggsave(filename = paste0("kmedia2010_mun_", ano, ".png"), plot = kmedia2010_mun13a22)
+  # Salvar os gráficos interativos como html 
+  htmlwidgets::saveWidget(as_widget(p_mun), paste0("kmedia2010_mun_", ano, ".html"))
 }
+
+
 
 
 
@@ -131,29 +158,42 @@ dados_cluster_mun_dec <- dados_decada_mun %>%
   select(mortalidade_mun_C2010, IDHM) %>%
   scale()
 
-# Calcular o total within sum of squares (wss) para diferentes valores de k
+# Calcular o total within sum of squares (wss) 
 wss_mun <- (nrow(dados_cluster_mun_dec)-1)*sum(apply(dados_cluster_mun_dec, 2, var))
 for (i in 2:15) wss_mun[i] <- sum(kmeans(dados_cluster_mun_dec, centers=i, nstart=25)$tot.withinss)
 
 # Plotar o gráfico para o método do cotovelo
 plot(1:15, wss_mun, type="b", xlab="Número de Clusters (k)", ylab="WSS (within sum of squares)")
 
-# Executar K-means com o número ótimo de clusters
+# Executar K-means com o número de clusters dado
 resultado_kmedia_mun_dec <- kmeans(dados_cluster_mun_dec, centers = 4, nstart=25)
 
 # Adicionar os rótulos dos clusters ao data frame original
 dados_decada_mun <- dados_decada_mun %>%
   mutate(cluster_km_mun_dec = resultado_kmedia_mun_dec$cluster)
 
-# Visualizar os clusters baseados em IDH e taxa de mortalidade para toda a década
-kmedia_decada_mun <- ggplot(dados_decada_mun, aes(x = IDHM, y = mortalidade_mun_C2010, color = as.factor(cluster_km_mun_dec))) +
-  geom_point(size = 2) +
-  labs(color = "Cluster", y = "Taxa de Mortalidade (Total da Década)", x = "IDH") +
-  theme_minimal() +
-  ggtitle("K-médias: IDH dos Municípios do ES e Taxa de Mortalidade (2013-2022)")
+# Criar o gráfico com Plotly
+p_decada_mun <- plot_ly(
+  data = dados_decada_mun,
+  x = ~IDHM,
+  y = ~mortalidade_mun_C2010,
+  color = ~as.factor(cluster_km_mun_dec),
+  colors = "Set1",
+  type = 'scatter',
+  mode = 'markers',
+  text = ~CIDADE,  
+  hoverinfo = 'text',
+  marker = list(size = 10)
+) %>%
+  layout(
+    title = "K-médias: IDH dos Municípios do ES e Taxa de Mortalidade (2013-2022)",
+    xaxis = list(title = "IDH"),
+    yaxis = list(title = "Taxa de Mortalidade (Total da Década)")
+  )
 
-# Exibir o gráfico
-print(kmedia_decada_mun)
 
-# Salvar o gráfico da década
-ggsave(filename = "kmedia_decada_mun_2013_2022.png", plot = kmedia_decada_mun)
+print(p_decada_mun)
+
+# Salvar o gráfico interativo da década como html 
+htmlwidgets::saveWidget(as_widget(p_decada_mun), "kmedia_decada_mun.html")
+

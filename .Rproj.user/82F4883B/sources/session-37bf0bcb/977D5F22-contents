@@ -1,4 +1,7 @@
 #library(dbscan)
+#library(dplyr)
+#library(ggplot2)
+#library(plotly)
 
 #ESTADOS
 
@@ -26,22 +29,31 @@ for (ano in 2013:2022) {
   # Adicionar os clusters ao data frame original
   dados_ano_est$cluster_dbscan <- dbscan_result_est$cluster
   
-  # Visualizar os clusters para o ano específico
-  cluster_plot_dbscan_est <- ggplot(dados_ano_est, aes(x = IDHM, y = mortalidade_C2010, color = as.factor(cluster_dbscan))) +
-    geom_point(size = 2) +
-    labs(color = "Cluster", y = "Taxa de Mortalidade", x = "IDH") +
-    theme_minimal() +
-    ggtitle(paste("DBSCAN: IDH e Taxa de Mortalidade (Estado) -", ano))
+  # Criar o gráfico com Plotly
+  p_dbscan_est <- plot_ly(
+    data = dados_ano_est,
+    x = ~IDHM,
+    y = ~mortalidade_C2010,
+    color = ~as.factor(cluster_dbscan),
+    colors = "Set1",
+    type = 'scatter',
+    mode = 'markers',
+    text = ~Sigla, 
+    hoverinfo = 'text',
+    marker = list(size = 10)
+  ) %>%
+    layout(
+      title = paste("DBSCAN: IDH e Taxa de Mortalidade (Estado) -", ano),
+      xaxis = list(title = "IDH"),
+      yaxis = list(title = "Taxa de Mortalidade")
+    )
+
   
-  # Exibir o gráfico
-  print(cluster_plot_dbscan_est)
-  
-  # Salvar o gráfico dos clusters como um arquivo PNG
-  ggsave(filename = paste0("dbscan_est_", ano, ".png"), plot = cluster_plot_dbscan_est)
+  print(p_dbscan_est)
+
+  # Salvar os gráficos interativos como html 
+  htmlwidgets::saveWidget(as_widget(p_dbscan_est), paste0("dbscan2010_est_", ano, ".html"))
 }
-
-
-
 
 
 
@@ -66,18 +78,30 @@ for (ano in 2013:2022) {
   # Adicionar os clusters ao data frame original
   dados_ano_mun$cluster_dbscan_mun <- dbscan_result_mun$cluster
   
-  # Visualizar os clusters para o ano específico
-  cluster_plot_dbscan_mun <- ggplot(dados_ano_mun, aes(x = IDHM, y = mortalidade_mun_C2010, color = as.factor(cluster_dbscan_mun))) +
-    geom_point(size = 2) +
-    labs(color = "Cluster", y = "Taxa de Mortalidade", x = "IDH") +
-    theme_minimal() +
-    ggtitle(paste("DBSCAN: IDH e Taxa de Mortalidade -", ano))
+  # Criar o gráfico com Plotly
+  p_dbscan_mun <- plot_ly(
+    data = dados_ano_mun,
+    x = ~IDHM,
+    y = ~mortalidade_mun_C2010,
+    color = ~as.factor(cluster_dbscan_mun),
+    colors = "Set1",
+    type = 'scatter',
+    mode = 'markers',
+    text = ~CIDADE, 
+    hoverinfo = 'text',
+    marker = list(size = 10)
+  ) %>%
+    layout(
+      title = paste("DBSCAN: IDH e Taxa de Mortalidade (Municípios) -", ano),
+      xaxis = list(title = "IDH"),
+      yaxis = list(title = "Taxa de Mortalidade")
+    )
   
-  # Exibir o gráfico
-  print(cluster_plot_dbscan_mun)
+
+  print(p_dbscan_mun)
   
-  # Salvar o gráfico dos clusters como um arquivo PNG
-  ggsave(filename = paste0("dbscan_mun_", ano, ".png"), plot = cluster_plot_dbscan_mun)
+  # Salvar os gráficos interativos como html 
+  htmlwidgets::saveWidget(as_widget(p_dbscan_mun), paste0("dbscan2010_mun_", ano, ".html"))
 }
 
 
@@ -90,7 +114,7 @@ dados_decada <- dados_idh_municipios %>%
   group_by(CIDADE) %>%
   summarise(
     mortalidade_tot_C2010 = sum(mortalidade_tot_C2010, na.rm = TRUE),
-    IDHM = first(IDHM)  # Supondo que o IDHM não muda significativamente ao longo da década
+    IDHM = first(IDHM) 
   ) %>%
   ungroup()
 
@@ -107,23 +131,35 @@ dados_cluster_decada <- dados_decada %>%
   scale()
 
 # Aplicar o DBSCAN
-eps_value <- 0.75  # Ajuste este valor conforme necessário
-minPts_value <- 2  # Ajuste este valor conforme necessário
+eps_value <- 0.75  
+minPts_value <- 2  
 
 dbscan_result_decada <- dbscan(dados_cluster_decada, eps = eps_value, minPts = minPts_value)
 
 # Adicionar os clusters ao data frame original
 dados_decada$cluster_dbscan <- dbscan_result_decada$cluster
 
-# Visualizar os clusters para toda a década
-cluster_plot_dbscan_decada <- ggplot(dados_decada, aes(x = IDHM, y = mortalidade_tot_C2010, color = as.factor(cluster_dbscan))) +
-  geom_point(size = 2) +
-  labs(color = "Cluster", y = "Taxa de Mortalidade (Total da Década)", x = "IDH") +
-  theme_minimal() +
-  ggtitle("DBSCAN: IDH e Taxa de Mortalidade por Psicoativos - Década 2013-2022")
+# Criar o gráfico da década com Plotly
+p_dbscan_decada <- plot_ly(
+  data = dados_decada,
+  x = ~IDHM,
+  y = ~mortalidade_tot_C2010,
+  color = ~as.factor(cluster_dbscan),
+  colors = "Set1",
+  type = 'scatter',
+  mode = 'markers',
+  text = ~CIDADE,  
+  hoverinfo = 'text',
+  marker = list(size = 10)
+) %>%
+  layout(
+    title = "DBSCAN: IDH e Taxa de Mortalidade por Psicoativos - Década 2013-2022",
+    xaxis = list(title = "IDH"),
+    yaxis = list(title = "Taxa de Mortalidade (Total da Década)")
+  )
 
-# Exibir o gráfico
-print(cluster_plot_dbscan_decada)
 
-# Salvar o gráfico dos clusters como um arquivo PNG
-ggsave(filename = "dbscan_mun_decada_2013_2022.png", plot = cluster_plot_dbscan_decada)
+print(p_dbscan_decada)
+
+# Salvar o gráfico interativo da década como html 
+htmlwidgets::saveWidget(as_widget(p_dbscan_decada), "dbscan_mun_decada.html")
