@@ -24,11 +24,11 @@ for (ano in 2013:2022) {
   plot(hc_ano_est, labels = dados_ano_est$Estado, 
        main = paste("Dendrograma de Clusterização Hierárquica (Estados) -", ano), 
        xlab = "", ylab = "Altura")
-  rect.hclust(hc_ano_est, k = 5, border = 2:6)
+  rect.hclust(hc_ano_est, k = 3, border = 2:6)
   dev.off()
   
   # Adicionar os clusters ao data frame original
-  dados_ano_est$cluster_hc <- cutree(hc_ano_est, k = 5)
+  dados_ano_est$cluster_hc <- cutree(hc_ano_est, k = 3)
   
   # Criar o gráfico com Plotly
   p_hc_est <- plot_ly(
@@ -44,7 +44,7 @@ for (ano in 2013:2022) {
     marker = list(size = 10)
   ) %>%
     layout(
-      title = paste("Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Estados -", ano),
+      title = paste("Hierárquica: IDH e Taxa de Mortalidade dos Estados -", ano),
       xaxis = list(title = "IDH"),
       yaxis = list(title = "Taxa de Mortalidade")
     )
@@ -105,7 +105,7 @@ for (ano in 2013:2022) {
     marker = list(size = 10)
   ) %>%
     layout(
-      title = paste("Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Municípios -", ano),
+      title = paste("Hierárquica: IDH e Taxa de Mortalidade dos Municípios -", ano),
       xaxis = list(title = "IDH"),
       yaxis = list(title = "Taxa de Mortalidade")
     )
@@ -179,7 +179,7 @@ p_decada_hc_mun <- plot_ly(
   marker = list(size = 10)
 ) %>%
   layout(
-    title = "Clusterização Hierárquica: IDH e Taxa de Mortalidade dos Municípios do ES - Década 2013-2022",
+    title = "Hierárquica: IDH e Taxa de Mortalidade dos Municípios do ES - Década 2013-2022",
     xaxis = list(title = "IDH"),
     yaxis = list(title = "Taxa de Mortalidade (Total da Década)")
   )

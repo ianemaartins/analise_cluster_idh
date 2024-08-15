@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DaSLab</title>
+    <style>
+        body {
+            margin: 100px;
+            font-family: Arial, sans-serif;
+        }
+        .text-box {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .chart {
+            flex: 0 0 49%; /* Dois gráficos lado a lado, com 48% da largura cada */
+            padding: 10px; /* Padding ao redor de cada gráfico */
+            box-sizing: border-box; /* Inclui o padding na largura total do elemento */
+            margin-bottom: 20px; /* Espaçamento entre as linhas de gráficos */
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: none; /* Remove borda ao redor dos iframes */
+        }
+        .chart-full {
+            flex: 0 0 100%; /* Faz com que o gráfico ocupe 100% da largura */
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Análise de Cluster:  IDH e Taxa de Mortalidade por Psicoativos</h1>
+
+    <div class="text-box">
+        <p> A presente análise tem como objetivo agrupar os estados brasileiros e municípios capixabas em relação ao IDH e à taxa de mortalidade por psicoativos. Para a análise foram usados os dados de mortes por psicoativos disponíveis no SIM, assim como os dados de população disponíveis no banco de dados do IBGE e os dados de IDH e IDHM disponíveis no site do Atlas Brasil. Foram utilizados três métodos de clusterização, sendo eles o método hierárquico, método k-médias e método DBSCAN. A taxa de mortalidade dos estados foi calculado a cada 100.000 habitantes e a das cidades a cada 10.000. Além disso, como a taxa de mortalidade a cada 10.000 habitantes é baixa nas cidades, optamos por construir também uma taxa de mortalidade da década (2013-2022).
+        </p>    
+    </div>
+
+
+
+    <h2>Estados do Brasil x IDH</h2>
+
+    <div class="text-box">
+        <p>Para começar a análise é necessário descobrir em quantos clusters os dados devem ser agrupados. Para isso, foi utilizado o método do cotovelo, que considera a variância dentro dos clusters. Nesse método, quanto maior o número de grupos, menor a variância entre os elementos, assim, o número ótimo de clusters deve ser aquele em que a variância se estabiliza. De forma metafórica, é onde o cotovelo acaba. No caso do nosso estudo, a quantidade ótima de clusters é 4.</p>
+    </div>
+
+    <div class="chart-full">
+        <div class="chart">
+            <iframe src="grafico_cotovelo_estados.png"></iframe>
+        </div>
+    </div>
+
+
+    <h3>Análise de Clusterização K-médias</h3>
+
+    <div class="text-box">
+        <p>Aplicando o método k-médias podemos ver até o ano de 2019, os únicos estados que tinham tido uma Taxa de Mortalidade superior a 8 mortes por psicoativos a cada 100.000 habitante haviam sido o Sergipe, Minas Gerais e Ceará, sendo o primeiro presente em todos os anos. A partir de 2020, outros 6 estados passaram a ter uma taxa de mortalidade maior do que 8.</p>
+    </div>
+
+    <div class="container">
+        <div class="chart">
+            <iframe src="kmedia2010_est_2013.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2014.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2015.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2016.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2017.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2018.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2019.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2020.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2021.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_est_2022.html"></iframe>
+        </div>
+    </div>
+
+    <h3>Análise de Clusterização Hierárquica</h3>
+
+    <div class="text-box">
+        <p>Utilizando o método hierárquico, construímos inicialmente dendrogramas que medem a distância entre os pontos. A partir disso, na plotagens dos gráficos, percebemos que nos anos de 2013, 2016 e 2019 o estado do Sergipe teve um distância considerável dos  demais estados.</p>
+    </div>
+
+    <div class="container">
+        <div class="chart">
+            <iframe src="dendrograma_est_2013.png"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dendrograma_est_2022.png"></iframe>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2013.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2014.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2015.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2016.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2017.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2018.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2019.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2020.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2021.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_est_2022.html"></iframe>
+        </div>
+    </div>
+
+    <h3>Análise de Clusterização DBSCAN</h3>
+
+    <div class="text-box">
+        <p>Através do método DBSCAN é possível ver a densidade das informações, assim, estados mais divergentes em relação ao IDH e à taxa de mortalidade aparecem como parte de um grupo isolado. No estudo, os estados do Sergipe, Ceará e Minas Gerais se mostraram discrepantes em relação ao eixo y, isto é, à taxa de mortalidade, enquanto o Distrito Federal se mostrou discrepância em relação ao eixo x, do IDH. Além disso, durante o passar dos anos a variação da taxa de mortalidade fez com que o número de grupos aumentasse.</p>
+    </div>
+
+    <div class="container">
+        <div class="chart">
+            <iframe src="dbscan2010_est_2013.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2014.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2015.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2016.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2017.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2018.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2019.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2020.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2021.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_est_2022.html"></iframe>
+        </div>
+    </div>
+
+
+    <h2>Municipios do Espírito Santo x IDHM</h2>
+
+    <div class="text-box">
+        <p>Na análise dos municípios do estado do Espírito Santo também usamos o método do cotovelo e os dendrogramas, tendo um número ótimo igual a 4.</p>
+    </div>
+
+    <div class="chart-full">
+        <div class="chart">
+            <iframe src="grafico_cotovelo_municipios.png"></iframe>
+        </div>
+    </div>
+
+
+    <h3>Análise de Clusterização K-médias</h3>
+
+    <div class="text-box">
+        <p>Através do método de k-médias podemos perceber um agrupamento dos municípios com IDHM baixo, médio e alto e taxa de mortalidade inferior a aproximadamente 1,5. A taxa de mortalidade superior a aproximadamente 1,5 são agrupadas em outro cluster.</p>
+    </div>
+
+    
+    <div class="container">
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2013.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2014.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2015.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2016.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2017.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2018.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2019.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2020.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2021.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="kmedia2010_mun_2022.html"></iframe>
+        </div>
+    </div>
+
+    <h3>Análise de Clusterização Hierárquica</h3>
+
+    <div class="text-box">
+        <p>Através do método hierárquico é possível perceber quais municípios são mais discrepantes quando se trata da taxa de mortalidade. Como a taxa de mortalidade é um número muito pequeno, percebe-se também uma grande mudança entre os anos, pois apenas um morte pode mudar a posição da cidade no agrupamento.</p>
+    </div>
+
+    
+    <div class="container">
+        <div class="chart">
+            <iframe src="dendrograma_mun_2013.png"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dendrograma_mun_2022.png"></iframe>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2013.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2014.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2015.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2016.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2017.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2018.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2019.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2020.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2021.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="hierarquico2010_mun_2022.html"></iframe>
+        </div>
+    </div>
+
+    <h3>Análise de Clusterização DBSCAN</h3>
+
+    <div class="text-box">
+        <p>Assim como nos estados, o DBSCAN mostra os municípios com mortalidade ou IDHM mais discrepantes. Mucurici, Apiacá, Vila Pavão, Pinheiros, Atílio Vivácqua, Santa Maria de Jetibá e algumas outras cidades aparecem como discrepantes em relação a mortalidade, enquanto Vitória e Vila Velha aparecem discrepantes em relação ao IDHM.</p>
+    </div>
+
+    <div class="container">
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2013.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2014.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2015.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2016.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2017.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2018.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2019.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2020.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2021.html"></iframe>
+        </div>
+        <div class="chart">
+            <iframe src="dbscan2010_mun_2022.html"></iframe>
+        </div>
+    </div>
+  
+    <h2>Municipios do Espírito Santo x IDHM: Uma Análise por década</h2>
+
+    <div class="text-box">
+        <p>Como a taxa de mortalidade pode ser muito influenciada por apenas uma morte a mais a depender do tamanho da cidade, optamos por criar uma taxa de mortalidade da década, dessa forma, o tempo acaba por neutralizar essa influência por tamanho da população. Através desse cálculo é possível perceber que Mucurici apresenta a maior taxa de mortalidade e está no mesmo grupo de Pinheiros, Santa Maria de Jetibá e Boa Esperança.</p>
+    </div>
+
+        <div class="container">
+            <div class="chart">
+                <iframe src="hierarquico_dec_mun.html"></iframe>
+            </div>
+            <div class="chart">
+                <iframe src="kmedia_decada_mun.html"></iframe>
+            </div>
+            <div class="chart">
+                <iframe src="dbscan_mun_decada.html"></iframe>
+            </div>
+        </div>
+   
+
+</body>
+</html>

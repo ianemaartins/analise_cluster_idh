@@ -1,0 +1,33 @@
+---
+title: "Análise de cluster levando em consideração IDH e taxa de mortalidade por psicoativos"
+author: "Iane Martins"
+date: "2024-08-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(plotly)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introdução
+
+
+## Estados do Brasil x IDH
+
+### Análise de Clusterização Hierárquica 
+
+
+### Análise de Clusterização K-médias
+
+
+### Análise de Clusterização DBSCAN
+
+
+## Municipios do Espírito Santo x IDHM
+
+### Análise de Clusterização Hierárquica 
+
+### Análise de Clusterização K-médias
+
+### Análise de Clusterização DBSCAN

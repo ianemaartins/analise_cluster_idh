@@ -20,8 +20,11 @@ dados_cluster_est <- dados_idh_estados %>%
 wss_est <- (nrow(dados_cluster_est)-1)*sum(apply(dados_cluster_est, 2, var))
 for (i in 2:15) wss_est[i] <- sum(kmeans(dados_cluster_est, centers=i, nstart=25)$tot.withinss)
 
+# Salvar o gráfico do cotovelo como PNG
+png(filename = "grafico_cotovelo_estados.png", width = 800, height = 400)
 # Plotar o gráfico para o método do cotovelo
 plot(1:15, wss_est, type="b", xlab="Número de Clusters (k)", ylab="WSS (within sum of squares)")
+dev.off()  # Finalizar o dispositivo gráfico para salvar o arquivo
 
 # Executar K-means com o número de clusters determinado
 resultado_kmedia_est <- kmeans(dados_cluster_est, centers = 4, nstart=25)
@@ -56,7 +59,7 @@ for (ano in 2013:2022) {
     marker = list(size = 10)
   ) %>%
     layout(
-      title = paste("K-médias: IDH e mortalidade por psicoativos em", ano),
+      title = paste("K-médias: IDH dos estados e mortalidade por psicoativos em ", ano),
       xaxis = list(title = "IDH"),
       yaxis = list(title = "Taxa de Mortalidade")
     )
@@ -65,7 +68,7 @@ for (ano in 2013:2022) {
   print(p_est)
   
   # Salvar os gráficos interativos como html 
-  htmlwidgets::saveWidget(as_widget(p), paste0("kmedia2010_est_", ano, ".html"))
+  htmlwidgets::saveWidget(as_widget(p_est), paste0("kmedia2010_est_", ano, ".html"))
 }
   
   
@@ -90,8 +93,11 @@ dados_cluster_mun <- dados_idh_municipios %>%
 wss_mun <- (nrow(dados_cluster_mun)-1)*sum(apply(dados_cluster_mun, 2, var))
 for (i in 2:15) wss_mun[i] <- sum(kmeans(dados_cluster_mun, centers=i, nstart=25)$tot.withinss)
 
+# Salvar o gráfico do cotovelo como PNG
+png(filename = "grafico_cotovelo_municipios.png", width = 800, height = 400)
 # Plotar o gráfico para o método do cotovelo
 plot(1:15, wss_mun, type="b", xlab="Número de Clusters (k)", ylab="WSS (within sum of squares)")
+dev.off()  # Finalizar o dispositivo gráfico para salvar o arquivo
 
 # Executar K-means com o número de clusters dado
 resultado_kmedia_mun <- kmeans(dados_cluster_mun, centers = 4, nstart=25)
@@ -141,7 +147,7 @@ for (ano in 2013:2022) {
 dados_decada_mun <- dados_idh_municipios %>%
   group_by(CIDADE) %>%
   summarise(
-    mortalidade_mun_C2010 = sum(mortalidade_mun_C2010, na.rm = TRUE),
+    mortalidade_tot_C2010 = sum(mortalidade_tot_C2010, na.rm = TRUE),
     IDHM = first(IDHM) 
   ) %>%
   ungroup()
@@ -149,13 +155,13 @@ dados_decada_mun <- dados_idh_municipios %>%
 # Certificar que as colunas são numéricas
 dados_decada_mun <- dados_decada_mun %>%
   mutate(
-    mortalidade_mun_C2010 = as.numeric(mortalidade_mun_C2010),
+    mortalidade_tot_C2010 = as.numeric(mortalidade_tot_C2010),
     IDHM = as.numeric(IDHM)
   )
 
 # Escalonar as variáveis IDH e taxa de mortalidade da década
 dados_cluster_mun_dec <- dados_decada_mun %>%
-  select(mortalidade_mun_C2010, IDHM) %>%
+  select(mortalidade_tot_C2010, IDHM) %>%
   scale()
 
 # Calcular o total within sum of squares (wss) 
@@ -176,7 +182,7 @@ dados_decada_mun <- dados_decada_mun %>%
 p_decada_mun <- plot_ly(
   data = dados_decada_mun,
   x = ~IDHM,
-  y = ~mortalidade_mun_C2010,
+  y = ~mortalidade_tot_C2010,
   color = ~as.factor(cluster_km_mun_dec),
   colors = "Set1",
   type = 'scatter',

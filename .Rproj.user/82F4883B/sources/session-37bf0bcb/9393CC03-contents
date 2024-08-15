@@ -1,7 +1,0 @@
-# Passo 2: Ler o arquivo Excel
-tabela_idh_mun <- read_excel("tabela_idhm.xlsx")
-
-# Passo 3: Salvar o data frame como um arquivo RDS
-saveRDS(tabela_idh_mun, file = "tabela_idh_municipios.rds")
-
-
